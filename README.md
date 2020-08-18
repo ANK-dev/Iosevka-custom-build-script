@@ -11,7 +11,7 @@ Download [ttfautohint](https://www.freetype.org/ttfautohint/#download) and [otfc
 
 ## Setup
 
-Place the `build.bat` in the `.\` directory. Run the script once, and the "Iosevka" repository will be cloned. Edit (or create) the `private-build-plans.toml` with your custom font parameters.
+Place the `build.bat` in the `.\` directory. Run the script once, and the "Iosevka" repository will be cloned. Edit (or create) the `private-build-plans.toml` in the `.\Iosevka\` directory with your custom font parameters.
 
 A sample `private-build-plans.toml` is provided below:
 
