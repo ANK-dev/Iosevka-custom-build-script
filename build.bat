@@ -6,22 +6,34 @@ echo Iosevka Custom Build Script v1.0 by ANK-dev
 echo ===========================================
 echo.
 
+rem Workaround for variable comparison inside `if` statements
+setlocal enabledelayedexpansion
+
+:*******************************************************************************
+:DIR_CHECK
+:*******************************************************************************
 if not exist .\Iosevka\ (
-    echo [ERR] `.\Iosevka\` directory not found!
+    echo [ERROR] `.\Iosevka\` directory not found!
+
     set /p "confirm=Clone the repository from `https://github.com/be5invis/Iosevka`? ([Y]/n): "
-    if /i "%confirm%"=="y" goto Clone
+    if /i "!confirm!"=="y" goto CLONE
     
-    echo Operation aborted! Exiting...
+    echo [FATAL] Operation aborted^^! Exiting...
     exit /b 1
 ) else (
-    goto Main
+    goto MAIN
 )
 
-:Clone
+:*******************************************************************************
+:CLONE
+:*******************************************************************************
+rem end "delayed expansion" from :DIR_CHECK
+setlocal disabledelayedexpansion
+
 for %%X in (git.exe) do (set git_path=%%~$PATH:X)
 
 if not defined git_path (
-    echo [ERR!] Git is not installed! Install Git from `https://git-scm.com/` ^
+    echo [FATAL] Git is not installed! Install Git from `https://git-scm.com/` ^
     or clone Iosevka's repository manually. Exiting...
     exit /b 1
 )
@@ -29,30 +41,38 @@ if not defined git_path (
 call git clone https://github.com/be5invis/Iosevka
 
 if %ERRORLEVEL% neq 0 (
-    echo [ERR] Git error! Exiting...
+    echo [FATAL] Git error! Exiting...
     exit /b 1
 )
 
 rem Successful cloning. Exit script for build editing
-echo Repository cloned successfully! Edit the `private-build-plans.toml` in ^
-the `.\Iosevka` directory and run this script again
+echo [INFO] Repository cloned successfully! Edit the ^
+`private-build-plans.toml` in the `.\Iosevka` directory and run this script ^
+again
 exit /b 0
 
-:Main
+:*******************************************************************************
+:MAIN
+:*******************************************************************************
+rem erase temporary variables from :DIR_CHECK and :CLONE
+endlocal
 rem Change working directory to "Iosevka" folder
 cd Iosevka
 
-rem Create temporary enviroment for %PATH%
-setlocal
+rem Create temporary environment for %PATH%
+setlocal disabledelayedexpansion
 set "PATH=%PATH%;..\otfcc\;..\ttfautohint\"
 set env_var=false
 
-echo Be sure that the `private-build-plans.toml` file has been correctly ^
-configured
-echo.
-echo.
+echo [WARN] Be sure that the `private-build-plans.toml` file has been ^
+correctly configured
 timeout 5 >nul
+echo.
+echo.
 
+:*******************************************************************************
+:COMPONENT_CHECK
+:*******************************************************************************
 echo Testing essential components...
 echo ===============================
 echo.
@@ -80,12 +100,11 @@ if defined otfcc_path if defined ttfautohint_path if defined nodejs_path (
 )  
 
 if "%env_var%"=="false" (
-    echo [ERR] Essential components missing. Exiting...
-    endlocal
+    echo [FATAL] Essential components missing. Exiting...
     cd ..
     exit /b 1
 ) else (
-    echo Essential components OK!
+    echo [INFO] Essential components OK!
     echo.
     echo.
 )
@@ -94,27 +113,35 @@ echo Updating node_modules...
 echo ========================
 call npm install
 echo.
-echo.
 
 if %ERRORLEVEL% neq 0 (
-    echo [ERR] Node.js error!
-    endlocal
+    echo [FATAL] Node.js error!
     cd ..
     exit /b 1
+) else (
+    echo [INFO] node_modules updated successfully!
+    echo.
+    echo.
 )
 
-:Setup
+:*******************************************************************************
+:SETUP
+:*******************************************************************************
 echo Starting build setup...
 echo =======================
 echo.
 
-:Plan_Name
+:*******************************************************************************
+:PLAN_NAME
+:*******************************************************************************
 echo Plan Name
 echo ---------
 set /p "plan=Type the name of your Plan: "
 echo.
 
-:Contents
+:*******************************************************************************
+:CONTENTS
+:*******************************************************************************
 echo Build Contents
 echo --------------
 echo - `contents`: TTF (Hinted and Unhinted), WOFF(2) and Webfont CSS;
@@ -126,10 +153,10 @@ set /p "contents=Type the Contents of your build: "
 if not "%contents%"=="contents" if not "%contents%"=="ttf" ^
 if not "%contents%"=="woff" if not "%contents%"=="woff2" (
     echo.
-    echo The Contents you typed are invalid!
+    echo [ERROR] The Contents you typed are invalid!
     pause
     echo.
-    goto Contents
+    goto CONTENTS
 )
 echo.
 
@@ -141,8 +168,11 @@ echo.
 set /p "confirm=Is this OK? (y/[N]): "
 echo.
 echo.
-if /i not "%confirm%"=="y" goto Setup
+if /i not "%confirm%"=="y" goto SETUP
 
+:*******************************************************************************
+:BUILD
+:*******************************************************************************
 echo Starting the build process...
 echo =============================
 
@@ -150,11 +180,11 @@ call npm run build -- %contents%::%plan%
 echo.
 
 if %ERRORLEVEL% equ 0 (
-    echo Build finished successfully!
-    echo Your custom font is located in the `.\Iosevka\dist\%plan%` directory
+    echo [INFO] Build finished successfully!
+    echo [INFO] Your custom font is located in the `.\Iosevka\dist\%plan%` ^
+    directory
 ) else (
-    echo [ERR] Build failed! Exiting...
+    echo [FATAL] Build failed! Exiting...
 )
 
-endlocal
 cd ..
