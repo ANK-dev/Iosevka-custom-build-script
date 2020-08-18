@@ -8,8 +8,7 @@ echo.
 
 if not exist .\Iosevka\ (
     echo [ERR] `.\Iosevka\` directory not found!
-    set /p "confirm=Clone the repository from ^
-    `https://github.com/be5invis/Iosevka`? ([Y]/n): "
+    set /p "confirm=Clone the repository from `https://github.com/be5invis/Iosevka`? ([Y]/n): "
     if /i "%confirm%"=="y" goto Clone
     
     echo Operation aborted! Exiting...
