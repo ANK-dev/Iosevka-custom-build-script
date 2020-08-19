@@ -19,6 +19,7 @@ if not exist .\Iosevka\ (
     if /i "!confirm!"=="y" goto CLONE
     
     echo [FATAL] Operation aborted^^! Exiting...
+    pause
     exit /b 1
 ) else (
     goto MAIN
@@ -35,6 +36,7 @@ for %%X in (git.exe) do (set git_path=%%~$PATH:X)
 if not defined git_path (
     echo [FATAL] Git is not installed! Install Git from `https://git-scm.com/` ^
     or clone Iosevka's repository manually. Exiting...
+    pause
     exit /b 1
 )
 
@@ -42,6 +44,7 @@ call git clone https://github.com/be5invis/Iosevka
 
 if %ERRORLEVEL% neq 0 (
     echo [FATAL] Git error! Exiting...
+    pause
     exit /b 1
 )
 
@@ -49,6 +52,7 @@ rem Successful cloning. Exit script for build editing
 echo [INFO] Repository cloned successfully! Edit the ^
 `private-build-plans.toml` in the `.\Iosevka` directory and run this script ^
 again
+pause
 exit /b 0
 
 :*******************************************************************************
@@ -102,6 +106,7 @@ if defined otfcc_path if defined ttfautohint_path if defined nodejs_path (
 if "%env_var%"=="false" (
     echo [FATAL] Essential components missing. Exiting...
     cd ..
+    pause
     exit /b 1
 ) else (
     echo [INFO] Essential components OK!
@@ -117,6 +122,7 @@ echo.
 if %ERRORLEVEL% neq 0 (
     echo [FATAL] Node.js error!
     cd ..
+    pause
     exit /b 1
 ) else (
     echo [INFO] node_modules updated successfully!
@@ -188,3 +194,4 @@ if %ERRORLEVEL% equ 0 (
 )
 
 cd ..
+pause
