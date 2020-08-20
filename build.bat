@@ -35,7 +35,7 @@ for %%X in (git.exe) do (set git_path=%%~$PATH:X)
 
 if not defined git_path (
     echo [FATAL] Git is not installed! Install Git from `https://git-scm.com/` ^
-    or clone Iosevka's repository manually. Exiting...
+or clone Iosevka's repository manually. Exiting...
     pause
     exit /b 1
 )
@@ -188,7 +188,7 @@ echo.
 if %ERRORLEVEL% equ 0 (
     echo [INFO] Build finished successfully!
     echo [INFO] Your custom font is located in the `.\Iosevka\dist\%plan%` ^
-    directory
+directory
 ) else (
     echo [FATAL] Build failed! Exiting...
 )
